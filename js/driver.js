@@ -1,14 +1,24 @@
 import Main from "./main-thread.js";
 
 const runBtn = document.getElementById("run");
-const content = document.getElementById("console");
-const driver = new Main(content);
+const contentWindow = document.getElementById("console");
+const driver = new Main(contentWindow, "js/webworker.js");
+
+function mapToJSON(value){
+    return JSON.parse(value);
+}
 
 runBtn.addEventListener("click", function(){
-    let input = document.getElementById("numOfWorkersInput");
-    driver.run(input.value, content);
+    let numOrWorkersInput = document.getElementById("numOfWorkersInput");
+    let dataInput = document.getElementById("dataToWorkOn");
+    let listOfDataSets = dataInput.value.split("|").map(mapToJSON);
+    try {
+        driver.run({numOfWorkers: numOrWorkersInput.value, data: listOfDataSets});
+    } catch (e) {
+        driver.addContentEntry(`Error: ${e.message}`);
+    }
 });
 
 window.addEventListener('error', function(event) {
-    driver.addContentEntry("An error occurred");
+    driver.addContentEntry(`Error: ${event.message}`);
 });
