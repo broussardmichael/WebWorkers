@@ -1,9 +1,8 @@
 onmessage = function(message) {
-    const name = self.name;
     const data = message.data;
     retrieveDataToWorkOnPromise(data).then(function(retrievedData) {
-        let updatedData = operateOnData(data)
-        postMessage({name, updatedData});
+        let updatedData = operateOnData(retrievedData)
+        postMessage({type: "complete", message: `${self.name} completed its work.`, data:updatedData});
     }).catch(function(e) {
         throw `Failure is retrieving data: ${e}`
     });
@@ -35,8 +34,10 @@ function operateOnData(data) {
     let returnArr = [];
     for(let i = 0; i < data.length; i++) {
         let updateValue = data[i];
-        for(let j = 0; j < 1000; j++){
-            updateValue += updateValue + j;
+        for(let j = 0; j < 10000; j++){
+            for(let k = 0; k < 10000; k++) {
+                updateValue = updateValue + i + j - k;
+            }
         }
         returnArr.push(updateValue);
     }

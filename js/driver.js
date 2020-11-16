@@ -1,24 +1,36 @@
-import Main from "./main-thread.js";
+import WorkerPool from "./worker-pool.js";
 
 const runBtn = document.getElementById("run");
 const contentWindow = document.getElementById("console");
-const driver = new Main(contentWindow, "js/webworker.js");
+let workerPool;
+
+runBtn.addEventListener("click", function(){
+    contentWindow.innerHTML = "";
+    let numOrWorkersInput = document.getElementById("numOfWorkersInput");
+    let dataInput = document.getElementById("dataToWorkOn");
+    let listOfDataSets = dataInput.value.split("|").map(mapToJSON);
+    try {
+        if(!workerPool) {
+            workerPool = new WorkerPool(addContentEntry);
+        }
+        workerPool.init(numOrWorkersInput.value, "js/webworker.js")
+            .run(listOfDataSets);
+    } catch (e) {
+        addContentEntry(`Error: ${e.message}`);
+    }
+});
+
+window.addEventListener('error', function(event) {
+    addContentEntry(`Error: ${event.message}`);
+});
 
 function mapToJSON(value){
     return JSON.parse(value);
 }
 
-runBtn.addEventListener("click", function(){
-    let numOrWorkersInput = document.getElementById("numOfWorkersInput");
-    let dataInput = document.getElementById("dataToWorkOn");
-    let listOfDataSets = dataInput.value.split("|").map(mapToJSON);
-    try {
-        driver.run({numOfWorkers: numOrWorkersInput.value, data: listOfDataSets});
-    } catch (e) {
-        driver.addContentEntry(`Error: ${e.message}`);
-    }
-});
-
-window.addEventListener('error', function(event) {
-    driver.addContentEntry(`Error: ${event.message}`);
-});
+function addContentEntry(text) {
+    let paragraph = document.createElement("p");
+    let textNode = document.createTextNode(text);
+    paragraph.appendChild(textNode);
+    contentWindow.appendChild(paragraph);
+}
