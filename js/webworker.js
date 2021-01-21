@@ -1,8 +1,9 @@
 onmessage = function(message) {
     const data = message.data;
     retrieveDataToWorkOnPromise(data).then(function(retrievedData) {
-        let updatedData = operateOnData(retrievedData)
-        postMessage({type: "complete", message: `${self.name} completed its work.`, data:updatedData});
+        setTimeout(function () {
+            postMessage({type: "complete", message: `${self.name} completed its work.`, data: `${self.name} found this: ${retrievedData}`});
+        }, 10000);
     }).catch(function(e) {
         throw `Failure is retrieving data: ${e}`
     });
@@ -21,9 +22,7 @@ self.onunhandledrejection = function(e) {
 function retrieveDataToWorkOnPromise (data) {
     return new Promise(function(resolve, reject) {
         if(typeof data === 'string') {
-            return fetch(data);
-        } else if(Array.isArray(data)) {
-            resolve(data);
+            return resolve(data);
         } else {
             reject();
         }

@@ -41,12 +41,12 @@ export default class WorkerPool {
         error === null ? resolver(response) : rejector(error);
     }
     run(data){
-        this.logFn(`Applying computations to the data set: ${data.toString()}`);
+        this.logFn(`Doing Stuff!`);
         for(let i = 0; i < data.length; i++) {
             this.numberOfJobs += 1;
             this.addWork(data[i]).then(response => {
                 this.numberOfJobsCompleted++;
-                this.logFn(`${response.message}. The returned data set is: ${response.data.toString()}`);
+                this.logFn(`${response.message}. The returned data set is: ${response.data}`);
                 if(this.isWorkFinished()){
                     this.logFn(`All work is complete, terminating web workers. Thanks guys!`);
                     this.terminateWorkerPool();
@@ -59,9 +59,6 @@ export default class WorkerPool {
     addWork(work) {
         return new Promise( (resolve, reject) => {
             let activeWorkers = this.activeWorkers;
-            if(!Array.isArray(work)) {
-                reject("Work is not an array");
-            }
             if (this.idleWorkers.length === 0) {
                 this.logFn(`All workers are busy!`)
                 this.waitForWorker(function (worker, interval) {

@@ -8,13 +8,15 @@ runBtn.addEventListener("click", function(){
     contentWindow.innerHTML = "";
     let numOrWorkersInput = document.getElementById("numOfWorkersInput");
     let dataInput = document.getElementById("dataToWorkOn");
-    let listOfDataSets = dataInput.value.split("|").map(mapToJSON);
+    if(!dataInput.value) {
+        throw `Message is empty`;
+    }
     try {
         if(!workerPool) {
             workerPool = new WorkerPool(addContentEntry);
         }
         workerPool.init(numOrWorkersInput.value, "js/webworker.js")
-            .run(listOfDataSets);
+            .run(dataInput.value);
     } catch (e) {
         addContentEntry(`Error: ${e.message}`);
     }
